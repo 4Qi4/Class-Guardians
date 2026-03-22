@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>班级小助手 - 教师与学生平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: white;
+            color: #1f2d3d;
+            padding: 24px 20px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #d4d8dd;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e6ea;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            color: #1e466e;
+        }
+
+        button, .btn {
+            background-color: #f0f2f5;
+            border: 1px solid #bdc1c6;
+            border-radius: 32px;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1f2d3d;
+            cursor: pointer;
+            transition: 0.1s linear;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        button.primary {
+            background-color: #2c6e9e;
+            border-color: #1f4e6e;
+            color: white;
+        }
+
+        button.danger {
+            background-color: #f8e1e1;
+            border-color: #d99;
+            color: #a33;
+        }
+
+        button.warning {
+            background-color: #fdf0db;
+            border-color: #e6b87e;
+            color: #a65d2a;
+        }
+
+        button.small {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+        }
+
+        input, select, textarea {
+            border: 1px solid #cbd0d6;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            background: white;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .student-item, .assignment-item, .behavior-item {
+            border: 1px solid #e9ecef;
+            border-radius: 16px;
+            padding: 12px;
+            background: #fefefe;
+        }
+
+        .inline-badge {
+            background: #eef2f7;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        hr {
+            margin: 16px 0;
+            border-color: #e2e6ea;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .tab-btn.active {
+            background: #e9ecef;
+            border: 1px solid #adb5bd;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .message {
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: #eef6fc;
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 6px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .points-positive {
+            color: #2b7a4b;
+            font-weight: bold;
+        }
+
+        .points-negative {
+            color: #c0392b;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        .toggle-link {
+            color: #2c6e9e;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        /* 通用模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            padding: 24px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .modal-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-buttons-center {
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- 登录/注册视图 -->
+    <div id="authView">
+        <div class="card" style="max-width: 480px; margin: 20px auto;">
+            <div class="card-header" id="authTitle">📘 班级小助手 · 登录</div>
+            <div id="loginForm">
+                <label>角色</label>
+                <select id="loginRole">
+                    <option value="teacher">教师</option>
+                    <option value="student">学生</option>
+                </select>
+                <label>账号</label>
+                <input type="text" id="loginUsername" placeholder="教师使用注册账号 / 学生使用学号或自注册账号">
+                <label>密码</label>
+                <input type="password" id="loginPassword" placeholder="密码">
+                <button id="doLoginBtn" class="primary">登录</button>
+                <div><span class="toggle-link" id="showTeacherRegisterBtn">教师注册</span> | <span class="toggle-link" id="showStudentRegisterBtn">学生注册</span></div>
+            </div>
+            <div id="teacherRegisterForm" class="hidden">
+                <label>教师姓名</label>
+                <input type="text" id="teacherRegName" placeholder="真实姓名">
+                <label>教师账号 (唯一)</label>
+                <input type="text" id="teacherRegUsername" placeholder="英文或数字">
+                <label>密码</label>
+                <input type="password" id="teacherRegPassword" placeholder="至少4位">
+                <button id="doTeacherRegisterBtn" class="primary">注册教师账号</button>
+                <div><span class="toggle-link" id="backToLoginFromTeacher">返回登录</span></div>
+            </div>
+            <div id="studentRegisterForm" class="hidden">
+                <label>昵称/姓名</label>
+                <input type="text" id="studentRegName" placeholder="你的名字">
+                <label>用户名 (登录用)</label>
+                <input type="text" id="studentRegUsername" placeholder="英文字母或数字">
+                <label>密码</label>
+                <input type="password" id="studentRegPassword" placeholder="至少4位">
+                <button id="doStudentRegisterBtn" class="primary">注册学生账号</button>
+                <div><span class="toggle-link" id="backToLoginFromStudent">返回登录</span></div>
+            </div>
+            <div class="message" style="margin-top:12px;">💡 教师可注册账号创建班级；学生可自注册，或使用教师生成的账号（默认密码123456）登录。</div>
+        </div>
+    </div>
+
+    <!-- 教师主面板 -->
+    <div id="teacherView" class="hidden">
+        <div class="flex-row" style="justify-content: space-between; align-items:center; margin-bottom: 20px;">
+            <h2>👩‍🏫 教师工作台 - <span id="teacherNameSpan"></span></h2>
+            <button id="logoutBtn">退出登录</button>
+        </div>
+        <!-- 创建班级卡片 -->
+        <div class="card">
+            <div class="card-header">🏫 创建新班级</div>
+            <div class="flex-row">
+                <div style="flex:1"><label>班级名称</label><input type="text" id="className" placeholder="例如 三年级二班"></div>
+                <div style="flex:1"><label>学生人数 (批量生成账号)</label><input type="number" id="studentCount" value="5" min="1" max="50"></div>
+                <div><button id="createClassBtn" class="primary">创建班级 + 批量生成账号</button></div>
+            </div>
+        </div>
+
+        <!-- 班级列表及管理 -->
+        <div class="card">
+            <div class="card-header">📚 我的班级</div>
+            <div id="classListContainer"></div>
+        </div>
+
+        <!-- 所有作业管理卡片 -->
+        <div class="card">
+            <div class="card-header">📌 所有班级作业管理</div>
+            <div id="allAssignmentsContainer"></div>
+        </div>
+
+        <!-- 当前选中班级详情 -->
+        <div id="selectedClassPanel" class="hidden">
+            <div class="card">
+                <div class="card-header" id="selectedClassName">班级详情</div>
+                <div class="nav-tabs">
+                    <button class="tab-btn active" data-tab="students">👥 学生管理</button>
+                    <button class="tab-btn" data-tab="assignments">📝 作业管理</button>
+                    <button class="tab-btn" data-tab="behaviors">⭐ 表扬/惩罚</button>
+                </div>
+                <div id="studentsTab">
+                    <div class="flex-row" style="justify-content: space-between;"><h3>学生列表</h3><button id="addStudentBtn" class="small">+ 添加单个学生</button></div>
+                    <div id="studentList"></div>
+                </div>
+                <div id="assignmentsTab" class="hidden">
+                    <button id="createAssignmentBtn" class="primary small">📌 留作业</button>
+                    <div id="assignmentList"></div>
+                </div>
+                <div id="behaviorsTab" class="hidden">
+                    <div class="flex-row"><button id="praiseStudentBtn" class="warning small">👍 表扬学生 (+5分)</button><button id="punishStudentBtn" class="danger small">⚠️ 惩罚学生 (-3分)</button></div>
+                    <div id="behaviorRecordsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学生主面板 -->
+    <div id="studentView" class="hidden">
+        <div class="flex-row" style="justify-content: space-between;">
+            <h2>🧑‍🎓 学生园地</h2>
+            <button id="studentLogoutBtn">退出登录</button>
+        </div>
+        <div id="studentInfoCard" class="card">
+            <div><strong>姓名:</strong> <span id="studentNameSpan"></span> <button id="changeStudentNameBtn" class="small" style="margin-left: 8px;">✏️ 修改昵称</button> | <strong>班级:</strong> <span id="studentClassSpan">未加入班级</span> | <strong>总积分:</strong> <span id="studentPointsSpan">0</span></div>
+            <div id="joinClassSection" style="margin-top:12px;">
+                <label>📎 使用邀请码加入班级</label>
+                <div class="flex-row"><input type="text" id="inviteCodeInput" placeholder="请输入班级邀请码"><button id="joinClassByCodeBtn">加入班级</button></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">📋 作业列表 & 提交</div>
+            <div id="studentAssignmentsList"></div>
+        </div>
+        <div class="card">
+            <div class="card-header">🏅 我的成长记录 (表扬/惩罚)</div>
+            <div id="studentBehaviorLog"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 创建作业模态框 -->
+<div id="assignmentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">📝 创建新作业</div>
+        <label>作业标题</label>
+        <input type="text" id="modalAssignTitle" placeholder="例如 数学练习册P20">
+        <label>作业描述</label>
+        <textarea id="modalAssignDesc" rows="3" placeholder="详细要求..."></textarea>
+        <label>截止日期</label>
+        <input type="text" id="modalAssignDeadline" placeholder="2025-06-01">
+        <div class="modal-buttons">
+            <button id="modalCancelBtn">取消</button>
+            <button id="modalConfirmBtn" class="primary">确认留作业</button>
+        </div>
+    </div>
+</div>
+
+<!-- 通用提示模态框 -->
+<div id="genericModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" id="genericModalTitle">提示</div>
+        <p id="genericModalMessage"></p>
+        <div class="modal-buttons modal-buttons-center" id="genericModalButtons">
+            <button id="genericModalConfirmBtn" class="primary">确定</button>
+        </div>
+    </div>
+</div>
+
+<!-- 通用确认模态框 -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" id="confirmModalTitle">确认操作</div>
+        <p id="confirmModalMessage"></p>
+        <div class="modal-buttons">
+            <button id="confirmModalCancelBtn">取消</button>
+            <button id="confirmModalOkBtn" class="primary">确定</button>
+        </div>
+    </div>
+</div>
+
+<footer>⚡ 数据存储于浏览器本地，支持教师注册与学生自主注册 | 学生可通过邀请码加入班级，支持学生自行修改昵称，教师可修改学生姓名</footer>
+
+<script>
+    // ---------- 存储keys ----------
+    const STORAGE = {
+        teachers: "class_helper_teachers",
+        students: "class_helper_students_self",
+        classes: "class_helper_classes",
+        assignments: "class_helper_assignments",
+        submissions: "class_helper_submissions",
+        behaviors: "class_helper_behaviors"
+    };
+
+    // 全局数据
+    let teachers = [];
+    let students = [];
+    let classes = [];
+    let assignments = [];
+    let submissions = [];
+    let behaviors = [];
+
+    let currentUser = null;
+    let currentTeacherSelectedClassId = null;
+
+    // 辅助函数：通用提示框
+    function showAlert(message, title = "提示", callback) {
+        const modal = document.getElementById("genericModal");
+        const titleElem = document.getElementById("genericModalTitle");
+        const msgElem = document.getElementById("genericModalMessage");
+        const confirmBtn = document.getElementById("genericModalConfirmBtn");
+        titleElem.innerText = title;
+        msgElem.innerText = message;
+        modal.style.display = "flex";
+        const closeHandler = () => {
+            modal.style.display = "none";
+            confirmBtn.removeEventListener("click", closeHandler);
+            if (callback) callback();
+        };
+        confirmBtn.addEventListener("click", closeHandler);
+        modal.addEventListener("click", function bgClick(e) {
+            if (e.target === modal) {
+                modal.style.display = "none";
+                modal.removeEventListener("click", bgClick);
+                if (callback) callback();
+            }
+        });
+    }
+
+    // 通用确认框
+    function showConfirm(message, onConfirm, onCancel, title = "确认操作") {
+        const modal = document.getElementById("confirmModal");
+        const titleElem = document.getElementById("confirmModalTitle");
+        const msgElem = document.getElementById("confirmModalMessage");
+        const okBtn = document.getElementById("confirmModalOkBtn");
+        const cancelBtn = document.getElementById("confirmModalCancelBtn");
+        titleElem.innerText = title;
+        msgElem.innerText = message;
+        modal.style.display = "flex";
+        const cleanup = () => {
+            modal.style.display = "none";
+            okBtn.removeEventListener("click", handleOk);
+            cancelBtn.removeEventListener("click", handleCancel);
+            modal.removeEventListener("click", bgClick);
+        };
+        const handleOk = () => {
+            cleanup();
+            if (onConfirm) onConfirm();
+        };
+        const handleCancel = () => {
+            cleanup();
+            if (onCancel) onCancel();
+        };
+        const bgClick = (e) => {
+            if (e.target === modal) {
+                cleanup();
+                if (onCancel) onCancel();
+            }
+        };
+        okBtn.addEventListener("click", handleOk);
+        cancelBtn.addEventListener("click", handleCancel);
+        modal.addEventListener("click", bgClick);
+    }
+
+    // 保存数据
+    function persistData() {
+        localStorage.setItem(STORAGE.teachers, JSON.stringify(teachers));
+        localStorage.setItem(STORAGE.students, JSON.stringify(students));
+        localStorage.setItem(STORAGE.classes, JSON.stringify(classes));
+        localStorage.setItem(STORAGE.assignments, JSON.stringify(assignments));
+        localStorage.setItem(STORAGE.submissions, JSON.stringify(submissions));
+        localStorage.setItem(STORAGE.behaviors, JSON.stringify(behaviors));
+    }
+
+    function loadData() {
+        teachers = JSON.parse(localStorage.getItem(STORAGE.teachers) || "[]");
+        students = JSON.parse(localStorage.getItem(STORAGE.students) || "[]");
+        classes = JSON.parse(localStorage.getItem(STORAGE.classes) || "[]");
+        assignments = JSON.parse(localStorage.getItem(STORAGE.assignments) || "[]");
+        submissions = JSON.parse(localStorage.getItem(STORAGE.submissions) || "[]");
+        behaviors = JSON.parse(localStorage.getItem(STORAGE.behaviors) || "[]");
+        
+        if (teachers.length === 0) {
+            teachers.push({
+                id: Date.now(),
+                name: "张老师",
+                username: "teacher1",
+                password: "123456"
+            });
+            persistData();
+        }
+        if (classes.length > 0 && classes.some(c => !c.teacherId)) {
+            const defaultTeacher = teachers[0];
+            classes.forEach(c => { if(!c.teacherId) c.teacherId = defaultTeacher.id; });
+            persistData();
+        }
+    }
+
+    function generateInviteCode() {
+        return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    function batchCreateStudents(classId, className, count, teacherId) {
+        const newStudents = [];
+        for (let i = 1; i <= count; i++) {
+            const username = `${className.slice(0,4)}_S${i}_${Math.floor(Math.random()*1000)}`;
+            newStudents.push({
+                id: Date.now() + i + Math.random(),
+                username: username,
+                password: "123456",
+                displayName: `学生${i}`,
+                classId: classId,
+                teacherId: teacherId,
+                isSelfRegistered: false
+            });
+        }
+        students.push(...newStudents);
+        persistData();
+        return newStudents;
+    }
+
+    function createClass(teacherId, name, studentNum) {
+        const invite = generateInviteCode();
+        const newClass = { 
+            id: Date.now(), 
+            name: name, 
+            studentCount: studentNum, 
+            inviteCode: invite, 
+            teacherId: teacherId 
+        };
+        classes.push(newClass);
+        batchCreateStudents(newClass.id, name, studentNum, teacherId);
+        persistData();
+        return newClass;
+    }
+
+    function getClassByInvite(code) {
+        return classes.find(c => c.inviteCode === code);
+    }
+
+    function studentJoinClass(studentId, inviteCode) {
+        const targetClass = getClassByInvite(inviteCode);
+        if (!targetClass) return { success: false, msg: "邀请码无效" };
+        const student = students.find(s => s.id == studentId);
+        if (!student) return { success: false, msg: "学生不存在" };
+        if (student.classId) return { success: false, msg: "你已加入班级，无需重复加入" };
+        student.classId = targetClass.id;
+        persistData();
+        return { success: true, msg: `成功加入 ${targetClass.name}` };
+    }
+
+    function computeStudentPoints(studentId) {
+        const list = behaviors.filter(b => b.studentId == studentId);
+        let total = 0;
+        list.forEach(b => { total += b.pointsChange; });
+        return total;
+    }
+
+    // 学生改名（自己）
+    function changeSelfName(newName) {
+        if (!currentUser || currentUser.role !== 'student') return false;
+        const student = students.find(s => s.id === currentUser.id);
+        if (student) {
+            student.displayName = newName;
+            persistData();
+            renderStudentView();
+            return true;
+        }
+        return false;
+    }
+
+    // 教师修改学生姓名
+    function teacherChangeStudentName(studentId, newName) {
+        const student = students.find(s => s.id === studentId);
+        if (student) {
+            student.displayName = newName;
+            persistData();
+            if (currentTeacherSelectedClassId && student.classId === currentTeacherSelectedClassId) {
+                renderTeacherStudentList();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // ========== 教师视图渲染 ==========
+    function renderTeacherClasses() {
+        if (!currentUser || currentUser.role !== 'teacher') return;
+        const container = document.getElementById("classListContainer");
+        const myClasses = classes.filter(c => c.teacherId === currentUser.id);
+        if (myClasses.length === 0) { 
+            container.innerHTML = "<div class='message'>暂无班级，请先创建</div>"; 
+            return; 
+        }
+        let html = `<div class="grid-2">`;
+        myClasses.forEach(cls => {
+            const studentCountInClass = students.filter(s => s.classId === cls.id).length;
+            html += `<div class="student-item">
+                        <div><strong>${cls.name}</strong> <span class="inline-badge">邀请码: ${cls.inviteCode}</span></div>
+                        <div>👥 ${studentCountInClass}人 / 预设${cls.studentCount}</div>
+                        <div><button class="small selectClassBtn" data-id="${cls.id}">管理班级</button>
+                        <button class="small danger deleteClassBtn" data-id="${cls.id}">删除班级</button></div>
+                     </div>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+        document.querySelectorAll(".selectClassBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.dataset.id);
+                selectTeacherClass(id);
+            });
+        });
+        document.querySelectorAll(".deleteClassBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.dataset.id);
+                showConfirm("删除班级会同时删除班级内所有学生、作业、行为记录，确定删除吗？", () => {
+                    deleteClassAndChildren(id);
+                });
+            });
+        });
+    }
+
+    function deleteClassAndChildren(classId) {
+        classes = classes.filter(c => c.id !== classId);
+        students = students.filter(s => s.classId !== classId);
+        assignments = assignments.filter(a => a.classId !== classId);
+        submissions = submissions.filter(s => s.assignmentId && assignments.some(a=>a.id===s.assignmentId) ? false : true);
+        behaviors = behaviors.filter(b => b.classId !== classId);
+        persistData();
+        if(currentTeacherSelectedClassId === classId) {
+            document.getElementById("selectedClassPanel").classList.add("hidden");
+            currentTeacherSelectedClassId = null;
+        }
+        renderTeacherClasses();
+        renderAllAssignments();
+        if(currentTeacherSelectedClassId === null) {
+            document.getElementById("selectedClassPanel").classList.add("hidden");
+        }
+    }
+
+    function selectTeacherClass(classId) {
+        currentTeacherSelectedClassId = classId;
+        const cls = classes.find(c => c.id === classId);
+        if(!cls) return;
+        document.getElementById("selectedClassName").innerText = `🏷️ ${cls.name}  (邀请码: ${cls.inviteCode})`;
+        document.getElementById("selectedClassPanel").classList.remove("hidden");
+        renderTeacherStudentList();
+        renderTeacherAssignments();
+        renderTeacherBehaviorRecords();
+        switchTab('students');
+    }
+
+    function renderTeacherStudentList() {
+        const container = document.getElementById("studentList");
+        if(!container) return;
+        const classStudents = students.filter(s => s.classId === currentTeacherSelectedClassId);
+        if(classStudents.length===0){ container.innerHTML="<div>暂无学生，可创建班级时批量生成或点击添加</div>"; return;}
+        let html = `<table>
+                        <thead>
+                            <tr>
+                                <th>姓名/账号</th>
+                                <th>密码</th>
+                                <th>积分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+        classStudents.forEach(s => {
+            const points = computeStudentPoints(s.id);
+            html += `<tr>
+                        <td>${s.displayName} (${s.username})</td>
+                        <td>${s.password}</td>
+                        <td class="${points>=0?'points-positive':'points-negative'}">${points}</td>
+                        <td>
+                            <button class="small renameStuBtn" data-id="${s.id}">✏️ 改名</button>
+                            <button class="small resetPwdBtn" data-id="${s.id}">重置密码</button>
+                            <button class="small danger delStuBtn" data-id="${s.id}">移除</button>
+                        </td>
+                    </tr>`;
+        });
+        html+=`</tbody></table>`;
+        container.innerHTML = html;
+        // 改名按钮
+        document.querySelectorAll(".renameStuBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const sid = parseInt(btn.dataset.id);
+                const student = students.find(s => s.id === sid);
+                const currentName = student ? student.displayName : "";
+                const newName = prompt("请输入新的学生姓名:", currentName);
+                if (newName && newName.trim()) {
+                    if (teacherChangeStudentName(sid, newName.trim())) {
+                        showAlert("学生姓名已更新", "成功");
+                    } else {
+                        showAlert("修改失败，请重试", "错误");
+                    }
+                }
+            });
+        });
+        document.querySelectorAll(".resetPwdBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const sid = parseInt(btn.dataset.id);
+                const stu = students.find(s=>s.id===sid);
+                if(stu) { 
+                    stu.password = "123456"; 
+                    persistData(); 
+                    renderTeacherStudentList(); 
+                    showAlert("密码已重置为123456", "成功");
+                }
+            });
+        });
+        document.querySelectorAll(".delStuBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const sid = parseInt(btn.dataset.id);
+                showConfirm("确定要移除该学生吗？", () => {
+                    students = students.filter(s=>s.id !== sid);
+                    behaviors = behaviors.filter(b=>b.studentId !== sid);
+                    submissions = submissions.filter(sub=>sub.studentId !== sid);
+                    persistData();
+                    renderTeacherStudentList();
+                });
+            });
+        });
+    }
+
+    function renderTeacherAssignments() {
+        const container = document.getElementById("assignmentList");
+        if(!container) return;
+        const classAssignments = assignments.filter(a => a.classId === currentTeacherSelectedClassId).sort((a,b)=>b.createdAt - a.createdAt);
+        if(classAssignments.length===0){ container.innerHTML="<div>暂无作业，点「留作业」创建</div>"; return;}
+        let html = ``;
+        classAssignments.forEach(ass => {
+            const subs = submissions.filter(su => su.assignmentId === ass.id);
+            html += `<div class="student-item">
+                        <strong>📌 ${ass.title}</strong> 截止: ${ass.deadline}<br>${ass.description}<br>
+                        <span>提交人数: ${subs.length}</span>
+                        <button class="small viewSubmissionsBtn" data-id="${ass.id}">查看提交</button>
+                        <button class="small danger" data-delass="${ass.id}">删除作业</button>
+                        <div id="subList-${ass.id}" class="hidden" style="margin-top:8px;"></div>
+                     </div>`;
+        });
+        container.innerHTML = html;
+        attachAssignmentEvents();
+    }
+
+    function attachAssignmentEvents() {
+        document.querySelectorAll(".viewSubmissionsBtn").forEach(btn=>{
+            btn.addEventListener("click",(e)=>{
+                const aid = parseInt(btn.dataset.id);
+                const div = document.getElementById(`subList-${aid}`);
+                if(div.classList.contains("hidden")){
+                    const subsForThis = submissions.filter(s=>s.assignmentId===aid);
+                    let subHtml = `<hr><strong>提交记录:</strong>`;
+                    subsForThis.forEach(sub=>{
+                        const stu = students.find(s=>s.id===sub.studentId);
+                        subHtml += `<div><b>${stu?.displayName||'学生'}</b>: ${sub.content || "无文本"} <br><small>${sub.submittedAt}</small></div>`;
+                    });
+                    div.innerHTML = subHtml;
+                    div.classList.remove("hidden");
+                } else div.classList.add("hidden");
+            });
+        });
+        document.querySelectorAll("[data-delass]").forEach(btn=>{
+            btn.addEventListener("click",(e)=>{
+                const aid = parseInt(btn.dataset.delass);
+                showConfirm("删除作业也会清空所有提交，确定删除吗？", () => {
+                    assignments = assignments.filter(a=>a.id!==aid);
+                    submissions = submissions.filter(s=>s.assignmentId!==aid);
+                    persistData();
+                    renderTeacherAssignments();
+                    renderAllAssignments();
+                });
+            });
+        });
+    }
+
+    function renderAllAssignments() {
+        const container = document.getElementById("allAssignmentsContainer");
+        if(!container) return;
+        const myClasses = classes.filter(c => c.teacherId === currentUser.id);
+        const myClassIds = myClasses.map(c => c.id);
+        const myAssignments = assignments.filter(a => myClassIds.includes(a.classId)).sort((a,b)=>b.createdAt - a.createdAt);
+        if(myAssignments.length === 0) {
+            container.innerHTML = "<div class='message'>暂无任何作业，请先在班级中留作业。</div>";
+            return;
+        }
+        let html = `<div class="grid-2">`;
+        myAssignments.forEach(ass => {
+            const className = classes.find(c => c.id === ass.classId)?.name || "未知班级";
+            const subs = submissions.filter(su => su.assignmentId === ass.id);
+            html += `<div class="student-item">
+                        <strong>📌 ${ass.title}</strong> (${className})<br>
+                        截止: ${ass.deadline}<br>${ass.description}<br>
+                        <span>提交人数: ${subs.length}</span>
+                        <button class="small viewSubmissionsGlobalBtn" data-id="${ass.id}">查看提交</button>
+                        <button class="small danger delAssignGlobalBtn" data-id="${ass.id}">删除作业</button>
+                        <div id="globalSubList-${ass.id}" class="hidden" style="margin-top:8px;"></div>
+                     </div>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+        document.querySelectorAll(".viewSubmissionsGlobalBtn").forEach(btn=>{
+            btn.addEventListener("click",(e)=>{
+                const aid = parseInt(btn.dataset.id);
+                const div = document.getElementById(`globalSubList-${aid}`);
+                if(div.classList.contains("hidden")){
+                    const subsForThis = submissions.filter(s=>s.assignmentId===aid);
+                    let subHtml = `<hr><strong>提交记录:</strong>`;
+                    subsForThis.forEach(sub=>{
+                        const stu = students.find(s=>s.id===sub.studentId);
+                        subHtml += `<div><b>${stu?.displayName||'学生'}</b>: ${sub.content || "无文本"} <br><small>${sub.submittedAt}</small></div>`;
+                    });
+                    div.innerHTML = subHtml;
+                    div.classList.remove("hidden");
+                } else div.classList.add("hidden");
+            });
+        });
+        document.querySelectorAll(".delAssignGlobalBtn").forEach(btn=>{
+            btn.addEventListener("click",(e)=>{
+                const aid = parseInt(btn.dataset.id);
+                showConfirm("删除作业也会清空所有提交，确定删除吗？", () => {
+                    assignments = assignments.filter(a=>a.id!==aid);
+                    submissions = submissions.filter(s=>s.assignmentId!==aid);
+                    persistData();
+                    renderAllAssignments();
+                    if(currentTeacherSelectedClassId) renderTeacherAssignments();
+                });
+            });
+        });
+    }
+
+    function createAssignmentModal() {
+        const modal = document.getElementById("assignmentModal");
+        modal.style.display = "flex";
+        document.getElementById("modalAssignTitle").value = "";
+        document.getElementById("modalAssignDesc").value = "";
+        document.getElementById("modalAssignDeadline").value = "";
+        const confirmBtn = document.getElementById("modalConfirmBtn");
+        const cancelBtn = document.getElementById("modalCancelBtn");
+        const handleConfirm = () => {
+            const title = document.getElementById("modalAssignTitle").value.trim();
+            const desc = document.getElementById("modalAssignDesc").value.trim();
+            const deadline = document.getElementById("modalAssignDeadline").value.trim();
+            if(!title || !desc) { 
+                showAlert("请填写标题和描述", "提示");
+                return; 
+            }
+            if(currentTeacherSelectedClassId) {
+                const newAssign = { id: Date.now(), classId: currentTeacherSelectedClassId, title, description: desc, deadline: deadline || "未设置", createdAt: Date.now() };
+                assignments.push(newAssign);
+                persistData();
+                renderTeacherAssignments();
+                renderAllAssignments();
+                modal.style.display = "none";
+            } else {
+                showAlert("请先选择一个班级", "提示");
+                modal.style.display = "none";
+            }
+            cleanup();
+        };
+        const cleanup = () => {
+            confirmBtn.removeEventListener("click", handleConfirm);
+            cancelBtn.removeEventListener("click", cleanup);
+            window.removeEventListener("click", outsideClick);
+        };
+        const outsideClick = (e) => { if(e.target === modal) { modal.style.display = "none"; cleanup(); } };
+        confirmBtn.addEventListener("click", handleConfirm);
+        cancelBtn.addEventListener("click", cleanup);
+        window.addEventListener("click", outsideClick);
+    }
+
+    function addBehavior(classId, studentId, type, reason, pointsDelta) {
+        const newBehavior = { id: Date.now(), classId, studentId, type, reason, pointsChange: pointsDelta, createdAt: new Date().toLocaleString() };
+        behaviors.push(newBehavior);
+        persistData();
+        renderTeacherBehaviorRecords();
+        if(currentUser && currentUser.role==='student' && currentUser.id === studentId) renderStudentView();
+    }
+
+    function renderTeacherBehaviorRecords() {
+        const container = document.getElementById("behaviorRecordsList");
+        if(!container) return;
+        const classBehaviors = behaviors.filter(b => b.classId === currentTeacherSelectedClassId).sort((a,b)=>b.id-a.id);
+        if(classBehaviors.length===0){ container.innerHTML="<div>暂无记录，使用表扬/惩罚按钮</div>"; return;}
+        let html = `<table>
+                        <thead>
+                            <tr>
+                                <th>学生</th>
+                                <th>类型</th>
+                                <th>原因</th>
+                                <th>积分变化</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+        classBehaviors.forEach(b=>{
+            const stu = students.find(s=>s.id===b.studentId);
+            html+=`<tr>
+                        <td>${stu?.displayName||'未知'}</td>
+                        <td>${b.type==='praise'?'表扬🌟':'惩罚⚠️'}</td>
+                        <td>${b.reason}</td>
+                        <td class="${b.pointsChange>0?'points-positive':'points-negative'}">${b.pointsChange}</td>
+                        <td>${b.createdAt}</td>
+                    </tr>`;
+        });
+        html+=`</tbody></table>`;
+        container.innerHTML = html;
+    }
+
+    function switchTab(tabId) {
+        document.getElementById("studentsTab").classList.add("hidden");
+        document.getElementById("assignmentsTab").classList.add("hidden");
+        document.getElementById("behaviorsTab").classList.add("hidden");
+        document.getElementById(`${tabId}Tab`).classList.remove("hidden");
+        document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("active"));
+        document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add("active");
+    }
+
+    // 学生自注册
+    function registerStudent() {
+        const name = document.getElementById("studentRegName").value.trim();
+        const username = document.getElementById("studentRegUsername").value.trim();
+        const password = document.getElementById("studentRegPassword").value.trim();
+        if(!name || !username || !password) { showAlert("请完整填写信息", "注册失败"); return; }
+        if(password.length < 4) { showAlert("密码至少4位", "注册失败"); return; }
+        if(students.find(s => s.username === username)) { showAlert("用户名已存在", "注册失败"); return; }
+        const newStudent = {
+            id: Date.now(),
+            username: username,
+            password: password,
+            displayName: name,
+            classId: null,
+            isSelfRegistered: true,
+            teacherId: null
+        };
+        students.push(newStudent);
+        persistData();
+        showAlert("注册成功！请登录", "成功", () => {
+            toggleAuthForm("login");
+            document.getElementById("loginUsername").value = username;
+            document.getElementById("loginPassword").value = "";
+        });
+    }
+
+    function registerTeacher() {
+        const name = document.getElementById("teacherRegName").value.trim();
+        const username = document.getElementById("teacherRegUsername").value.trim();
+        const password = document.getElementById("teacherRegPassword").value.trim();
+        if(!name || !username || !password) { showAlert("请完整填写信息", "注册失败"); return; }
+        if(password.length < 4) { showAlert("密码至少4位", "注册失败"); return; }
+        if(teachers.find(t => t.username === username)) { showAlert("用户名已存在", "注册失败"); return; }
+        teachers.push({ id: Date.now(), name, username, password });
+        persistData();
+        showAlert("教师注册成功！请登录", "成功", () => {
+            toggleAuthForm("login");
+            document.getElementById("loginUsername").value = username;
+            document.getElementById("loginPassword").value = "";
+        });
+    }
+
+    function toggleAuthForm(form) {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("teacherRegisterForm").classList.add("hidden");
+        document.getElementById("studentRegisterForm").classList.add("hidden");
+        if(form === "login") {
+            document.getElementById("loginForm").classList.remove("hidden");
+            document.getElementById("authTitle").innerText = "📘 班级小助手 · 登录";
+        } else if(form === "teacher") {
+            document.getElementById("teacherRegisterForm").classList.remove("hidden");
+            document.getElementById("authTitle").innerText = "📘 班级小助手 · 教师注册";
+        } else if(form === "student") {
+            document.getElementById("studentRegisterForm").classList.remove("hidden");
+            document.getElementById("authTitle").innerText = "📘 班级小助手 · 学生注册";
+        }
+    }
+
+    function handleLogin() {
+        const role = document.getElementById("loginRole").value;
+        const username = document.getElementById("loginUsername").value.trim();
+        const pwd = document.getElementById("loginPassword").value.trim();
+        if(role === "teacher"){
+            const teacher = teachers.find(t => t.username === username && t.password === pwd);
+            if(teacher){
+                currentUser = { role: "teacher", id: teacher.id, username: teacher.username, name: teacher.name };
+                showTeacherView();
+            } else showAlert("教师账号或密码错误", "登录失败");
+        } else {
+            const student = students.find(s=>s.username === username && s.password === pwd);
+            if(student){
+                currentUser = { role: "student", id: student.id, username: student.username, classId: student.classId };
+                showStudentView();
+            } else showAlert("学生账号或密码错误，可自行注册或使用教师生成的账号（默认123456）", "登录失败");
+        }
+    }
+
+    function showTeacherView() {
+        document.getElementById("authView").classList.add("hidden");
+        document.getElementById("teacherView").classList.remove("hidden");
+        document.getElementById("studentView").classList.add("hidden");
+        document.getElementById("teacherNameSpan").innerText = currentUser.name || currentUser.username;
+        renderTeacherClasses();
+        renderAllAssignments();
+        document.getElementById("createClassBtn").onclick = () => {
+            const name = document.getElementById("className").value;
+            const count = parseInt(document.getElementById("studentCount").value);
+            if(!name) { showAlert("请输入班级名称", "提示"); return;}
+            createClass(currentUser.id, name, count);
+            renderTeacherClasses();
+            renderAllAssignments();
+            document.getElementById("className").value = "";
+        };
+        document.getElementById("addStudentBtn").onclick = () => {
+            const newName = prompt("学生姓名/显示名:");
+            if(newName && currentTeacherSelectedClassId){
+                const newStu = { 
+                    id: Date.now(), 
+                    username: `stu_${Math.floor(Math.random()*10000)}`, 
+                    password: "123456", 
+                    displayName: newName, 
+                    classId: currentTeacherSelectedClassId,
+                    teacherId: currentUser.id,
+                    isSelfRegistered: false
+                };
+                students.push(newStu);
+                persistData();
+                renderTeacherStudentList();
+            } else if(!currentTeacherSelectedClassId) showAlert("请先选择班级", "提示");
+        };
+        document.getElementById("createAssignmentBtn").onclick = () => {
+            if(!currentTeacherSelectedClassId){ showAlert("请先选择班级", "提示"); return; }
+            createAssignmentModal();
+        };
+        document.getElementById("praiseStudentBtn").onclick = ()=>{
+            const studentId = prompt("输入学生ID(可在学生列表查看)");
+            const reason = prompt("表扬理由");
+            if(studentId && reason){
+                addBehavior(currentTeacherSelectedClassId, parseInt(studentId), "praise", reason, +5);
+                renderTeacherStudentList();
+            }
+        };
+        document.getElementById("punishStudentBtn").onclick = ()=>{
+            const studentId = prompt("输入学生ID");
+            const reason = prompt("惩罚原因");
+            if(studentId && reason){
+                addBehavior(currentTeacherSelectedClassId, parseInt(studentId), "punish", reason, -3);
+                renderTeacherStudentList();
+            }
+        };
+        document.querySelectorAll(".tab-btn").forEach(btn=>{
+            btn.onclick = ()=> switchTab(btn.dataset.tab);
+        });
+    }
+
+    function showStudentView() {
+        document.getElementById("authView").classList.add("hidden");
+        document.getElementById("teacherView").classList.add("hidden");
+        document.getElementById("studentView").classList.remove("hidden");
+        renderStudentView();
+        document.getElementById("joinClassByCodeBtn").onclick = ()=>{
+            const code = document.getElementById("inviteCodeInput").value.trim();
+            if(code && currentUser){
+                const res = studentJoinClass(currentUser.id, code);
+                showAlert(res.msg, res.success ? "成功" : "失败");
+                if(res.success){
+                    const stu = students.find(s=>s.id===currentUser.id);
+                    if(stu) currentUser.classId = stu.classId;
+                    renderStudentView();
+                }
+            } else showAlert("请输入邀请码", "提示");
+        };
+        document.getElementById("changeStudentNameBtn").onclick = () => {
+            const newName = prompt("请输入新的昵称/姓名:", students.find(s=>s.id===currentUser.id)?.displayName || "");
+            if (newName && newName.trim()) {
+                if (changeSelfName(newName.trim())) {
+                    showAlert("昵称修改成功！", "成功");
+                } else {
+                    showAlert("修改失败", "错误");
+                }
+            }
+        };
+    }
+
+    function renderStudentView() {
+        if(!currentUser || currentUser.role !== 'student') return;
+        const student = students.find(s => s.id === currentUser.id);
+        if(!student) return;
+        document.getElementById("studentNameSpan").innerText = student.displayName || student.username;
+        const classObj = classes.find(c=>c.id === student.classId);
+        const points = computeStudentPoints(student.id);
+        document.getElementById("studentPointsSpan").innerText = points;
+        if(student.classId && classObj){
+            document.getElementById("studentClassSpan").innerHTML = `${classObj.name} ✅`;
+        } else {
+            document.getElementById("studentClassSpan").innerHTML = "未加入班级";
+        }
+        // 作业列表
+        const assignmentsListDiv = document.getElementById("studentAssignmentsList");
+        let assignHtml = "";
+        if(student.classId){
+            const classAssigns = assignments.filter(a=>a.classId === student.classId);
+            if(classAssigns.length===0) assignHtml="<div>暂无作业</div>";
+            else{
+                classAssigns.forEach(ass=>{
+                    const mySub = submissions.find(su=>su.assignmentId===ass.id && su.studentId===student.id);
+                    assignHtml+=`<div class="student-item"><b>${ass.title}</b> 截止:${ass.deadline}<br>${ass.description}<br>`;
+                    if(mySub){
+                        assignHtml+=`<span>✅ 已提交: ${mySub.content}</span><br>`;
+                    } else {
+                        assignHtml+=`<textarea id="subContent_${ass.id}" rows="2" placeholder="提交作业内容..."></textarea>
+                                    <button class="small submitAssignBtn" data-aid="${ass.id}">提交作业</button>`;
+                    }
+                    assignHtml+=`</div>`;
+                });
+            }
+        } else {
+            assignHtml = "<div class='message'>请使用邀请码加入班级，才能查看作业</div>";
+        }
+        assignmentsListDiv.innerHTML = assignHtml;
+        document.querySelectorAll(".submitAssignBtn").forEach(btn=>{
+            btn.addEventListener("click",(e)=>{
+                const aid = parseInt(btn.dataset.aid);
+                const content = document.getElementById(`subContent_${aid}`).value;
+                if(!content.trim()){ showAlert("请输入作业内容", "提示"); return;}
+                const existing = submissions.find(su=>su.assignmentId===aid && su.studentId===student.id);
+                if(existing){
+                    existing.content = content;
+                    existing.submittedAt = new Date().toLocaleString();
+                } else {
+                    submissions.push({ id: Date.now(), assignmentId: aid, studentId: student.id, content: content, submittedAt: new Date().toLocaleString() });
+                }
+                persistData();
+                renderStudentView();
+                showAlert("作业已提交", "成功");
+            });
+        });
+        // 行为日志
+        const studentLogs = behaviors.filter(b=>b.studentId===student.id);
+        let logHtml = "";
+        if(studentLogs.length===0) logHtml="暂无表扬/惩罚记录";
+        else {
+            logHtml = `<table>
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>原因</th>
+                                    <th>分数变动</th>
+                                    <th>时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+            studentLogs.forEach(l=>{
+                logHtml+=`<tr>
+                                <td>${l.type==='praise'?'表扬🌟':'惩罚⚠️'}</td>
+                                <td>${l.reason}</td>
+                                <td>${l.pointsChange}</td>
+                                <td>${l.createdAt}</td>
+                            </tr>`;
+            });
+            logHtml+=`</tbody></table>`;
+        }
+        document.getElementById("studentBehaviorLog").innerHTML = logHtml;
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById("authView").classList.remove("hidden");
+        document.getElementById("teacherView").classList.add("hidden");
+        document.getElementById("studentView").classList.add("hidden");
+        document.getElementById("selectedClassPanel").classList.add("hidden");
+        toggleAuthForm("login");
+        document.getElementById("loginUsername").value = "";
+        document.getElementById("loginPassword").value = "";
+    }
+
+    window.onload = () => {
+        loadData();
+        document.getElementById("doLoginBtn").onclick = handleLogin;
+        document.getElementById("doTeacherRegisterBtn").onclick = registerTeacher;
+        document.getElementById("doStudentRegisterBtn").onclick = registerStudent;
+        document.getElementById("showTeacherRegisterBtn").onclick = () => toggleAuthForm("teacher");
+        document.getElementById("showStudentRegisterBtn").onclick = () => toggleAuthForm("student");
+        document.getElementById("backToLoginFromTeacher").onclick = () => toggleAuthForm("login");
+        document.getElementById("backToLoginFromStudent").onclick = () => toggleAuthForm("login");
+        document.getElementById("logoutBtn").onclick = logout;
+        document.getElementById("studentLogoutBtn").onclick = logout;
+        toggleAuthForm("login");
+    };
+</script>
+</body>
+</html>
